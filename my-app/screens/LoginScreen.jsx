@@ -7,19 +7,48 @@ import {
   KeyboardAvoidingView,
   TextInput,
   Pressable,
+  Alert
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = () => {
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
   const navigation=useNavigation();
 
-  const handleLogin=()=>{
+  useEffect(()=>{
+    const checkLoginStatus=(async ()=>{
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if(token){
+          navigation.replace('Main');
+        }
 
+      } catch (error) {
+        console.log("Token is not get",error);
+      }
+    })
+    checkLoginStatus();
+  },[])
+  const handleLogin=()=>{
+    const user={
+      email:email,
+      password:password
+    }
+    axios.post('http://192.168.0.18:8000/login',user).then((response)=>{
+      console.log("Login is successful ");
+      const token = response.data.token;
+      AsyncStorage.setItem('authToken',token);
+      navigation.replace("Main")
+    }).catch((error)=>{
+      Alert.alert("Login failed",error.message);
+      console.log(error);
+    })
   }
   return (
     <SafeAreaView

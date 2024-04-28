@@ -1,4 +1,4 @@
 ./my-app/node_modules
-./my-app/env
+my-app/api/config/config.env
 node_modules
 env

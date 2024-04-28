@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const dotEnv=require('dotenv');
 
 const app=express();
 const port=8000;
@@ -14,7 +15,10 @@ app.use(bodyParser.json());
 
 const jwt=require('jsonwebtoken');
 
-mongoose.connect('mongodb+srv://E-commerceReact-NativeProject:E-commerceReact-NativeProject@cluster0.ndttazh.mongodb.net/').then(()=>{
+dotEnv.config({
+    path:'config/config.env'
+})
+mongoose.connect(process.env.DB_URL).then(()=>{
     console.log("Mongodb is connected");
 }).catch((error)=>{
     console.log("Mongodb is not connected ",error);
@@ -44,7 +48,7 @@ const sendVerificationEmail=async (email,verificationToken)=>{
         from: "Shoaib.com",
         to:email,
         subject:"Email Verification",
-        text:`Please click the following link to verify your email : http://localhost:8000`
+        text:`Please click the following link to verify your email : http://192.168.0.18:8000/verify/${verificationToken}`
     }
 
     // send Mail
@@ -56,7 +60,7 @@ const sendVerificationEmail=async (email,verificationToken)=>{
     }
 }
 
-app.post('/register',async()=>{
+app.post('/register',async(req,res)=>{
     try {
         const {name,email,password} = req.body;
 
@@ -97,8 +101,8 @@ app.get("/verify/:token",async (req,res)=>{
     try {
         const token = req.params.token;
         // Find the user with the given token from the database
-
         const user=await User.findOne({verificationToken:token});
+        console.log(User.find());
         if(!user){
             return res.status(404).json({message:"Invalid Verification token"});
         }
@@ -109,8 +113,36 @@ app.get("/verify/:token",async (req,res)=>{
 
         await user.save();
         
-        res.status(200).json({message:"Email Verification Failed"});
+        res.status(200).json({message:"Email Verification Successful"});
     } catch (error) {
         res.status(500).json({message:"Email Verification Failed"});
+    }
+})
+
+const generateSecret=()=>{
+    const secretKey=crypto.randomBytes(32).toString("hex");
+    return secretKey;
+}
+
+const secretKey=generateSecret();
+
+app.post('/login',async (req,res)=>{
+    try {
+        const {email,password}=req.body;
+
+        const user=await User.findOne({email});
+        if(!user){
+            res.status(404).json({message:"Invalid email or password"});
+        }
+
+        if(password !== user.password){
+            return res.status(401).json({message:"Invalid password"});
+        }
+
+        // generate a token
+        const token=jwt.sign({userId:user._id},secretKey);
+        res.status(200).json({token});
+    } catch (error) {
+        res.status(500).json({message:"Login Failed"});
     }
 })
