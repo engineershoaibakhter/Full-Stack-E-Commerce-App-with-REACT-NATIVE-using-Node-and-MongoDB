@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Text } from 'react-native'
 
 const HomeScreen = () => {
@@ -175,6 +175,10 @@ const HomeScreen = () => {
   const [products,setProducts]=useState([]);
   const [open,setOpen]=useState(false);
   const [addresses,setAddresses]=useState([]);
+  const [category,setCategory]=useState("jewelery");
+  const [userId,setUserId]=useContext(UserType);
+  const [selectedAddress,setSelectedAddress]=useState("");
+  console.log("selectedAddress is ",selectedAddress);
   const navigation=useNavigation();
   return (
     <>
