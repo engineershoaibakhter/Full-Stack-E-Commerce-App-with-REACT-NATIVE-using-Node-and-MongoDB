@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Text } from 'react-native'
 
 const HomeScreen = () => {
@@ -180,6 +180,41 @@ const HomeScreen = () => {
   const [selectedAddress,setSelectedAddress]=useState("");
   console.log("selectedAddress is ",selectedAddress);
   const navigation=useNavigation();
+  const [items,setItems]=useState([
+    { label: "Men's clothing", value: "men's clothing" },
+    { label: "jewelery", value: "jewelery" },
+    { label: "electronics", value: "electronics" },
+    { label: "women's clothing", value: "women's clothing" },
+  ])
+  useEffect(()=>{
+    const fetchData= async ()=>{
+      try {
+        const response=await axios.get("https://fakestoreapi.com/products");
+        setProducts(response.data);
+        console.log("Response Data ",response.data);
+      } catch (error) {
+       console.log("Fetch Data is not getting ",error.message); 
+      }
+    }
+    fetchData();
+  },[])
+  const cart=useSelector((state)=> state.cart.cart);
+  const [modelVisible,setModelVisible]=useState(false);
+  useEffect(()=>{
+    if(userId){
+      fetchAddresses();
+    }
+  },[userId,modelVisible]);
+
+  const fetchAddresses=async ()=>{
+    try {
+      const response=await axios.get(`http://192.168.0.18:8000/addresses/${userId}`);
+      const {addresses} =response.data;
+      setAddresses(addresses);
+    } catch (error) {
+      console.log("addresses error ",error.message);
+    }
+  }
   return (
     <>
     <Text>HomeScreen</Text>
