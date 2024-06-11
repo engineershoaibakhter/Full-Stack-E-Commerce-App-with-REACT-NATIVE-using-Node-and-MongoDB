@@ -12,76 +12,58 @@ import {
 import React, { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { REACT_NATIVE_APP_API_URL } from '@env';
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const navigation = useNavigation();
-  const handleRegister = () => {
+
+  const handleRegister = async () => {
     const user = {
       name: name,
       email: email,
       password: password,
     };
 
-    // send a POST  request to the backend API to register the user
-
-    // axios
-    //   .post("http://localhost:8000/register", user)
-    //   .then((response) => {
-    //     console.log(response);
-    //     Alert.alert(
-    //       "Registration successful",
-    //       "You have been registered Successfully"
-    //     );
-    //     setName("");
-    //     setEmail("");
-    //     setPassword("");
-    //   })
-    //   .catch((error) => {
-    //     Alert.alert(
-    //       "Registration Error",
-    //       "An error occurred while registering"
-    //     );
-    //     console.log("registration failed", error);
-    //   });
-
-    fetch("http://192.168.0.18:8000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
+    try {
+      const response = await axios.post(
+        `${REACT_NATIVE_APP_API_URL}/register`,
+        user
+      );
+      if (response.status === 201) {
         Alert.alert(
           "Registration successful",
-          "You have been registered Successfully"
+          `You have been registered successfully. Check your email for verification. ${response.status}`
         );
         setName("");
         setEmail("");
         setPassword("");
-      })
-      .catch((error) => {
+      } else {
+        console.log(response.status + " and " + response);
+
         Alert.alert(
           "Registration Error",
-          "An error occurred while registering"
+          "An error occurred while registering."
         );
-        console.error("Registration failed:", error);
-      });
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Registration Error", error.response.data.message);
+      } else {
+        Alert.alert(
+          "Registration Error",
+          "An error occurred while registering."
+        );
+      }
+      console.log("Registration failed", error);
+    }
   };
+
   return (
     <SafeAreaView
       style={{
@@ -119,15 +101,14 @@ const RegisterScreen = () => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: 5,
               backgroundColor: "#D0D0D0",
               paddingVertical: 5,
               borderRadius: 5,
               marginTop: 30,
             }}
           >
-            <FontAwesome6
-              name="person-circle-question"
+            <FontAwesome
+              name="user"
               size={24}
               color="gray"
               style={{ marginLeft: 8 }}
@@ -139,9 +120,9 @@ const RegisterScreen = () => {
                 color: "gray",
                 marginVertical: 10,
                 width: 300,
-                fontSize: name ? 16 : 16,
+                fontSize: 16,
               }}
-              placeholder="enter your name"
+              placeholder="Enter your name"
             />
           </View>
 
@@ -149,7 +130,6 @@ const RegisterScreen = () => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: 5,
               backgroundColor: "#D0D0D0",
               paddingVertical: 5,
               borderRadius: 5,
@@ -162,7 +142,6 @@ const RegisterScreen = () => {
               size={24}
               color="gray"
             />
-
             <TextInput
               value={email}
               onChangeText={(text) => setEmail(text)}
@@ -170,9 +149,9 @@ const RegisterScreen = () => {
                 color: "gray",
                 marginVertical: 10,
                 width: 300,
-                fontSize: password ? 16 : 16,
+                fontSize: 16,
               }}
-              placeholder="enter your Email"
+              placeholder="Enter your Email"
             />
           </View>
         </View>
@@ -182,7 +161,6 @@ const RegisterScreen = () => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: 5,
               backgroundColor: "#D0D0D0",
               paddingVertical: 5,
               borderRadius: 5,
@@ -195,7 +173,6 @@ const RegisterScreen = () => {
               color="gray"
               style={{ marginLeft: 8 }}
             />
-
             <TextInput
               value={password}
               onChangeText={(text) => setPassword(text)}
@@ -204,9 +181,9 @@ const RegisterScreen = () => {
                 color: "gray",
                 marginVertical: 10,
                 width: 300,
-                fontSize: email ? 16 : 16,
+                fontSize: 16,
               }}
-              placeholder="enter your Password"
+              placeholder="Enter your Password"
             />
           </View>
         </View>
@@ -220,7 +197,6 @@ const RegisterScreen = () => {
           }}
         >
           <Text>Keep me logged in</Text>
-
           <Text style={{ color: "#007FFF", fontWeight: "500" }}>
             Forgot Password
           </Text>

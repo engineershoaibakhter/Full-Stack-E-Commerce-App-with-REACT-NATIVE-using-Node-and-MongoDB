@@ -15,13 +15,14 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { REACT_NATIVE_APP_API_URL } from '@env';
 
 const LoginScreen = () => {
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
   const navigation=useNavigation();
 
-  useEffect(()=>{
+  useEffect( ()=>{
     const checkLoginStatus=(async ()=>{
       try {
         const token = await AsyncStorage.getItem("authToken");
@@ -35,21 +36,39 @@ const LoginScreen = () => {
     })
     checkLoginStatus();
   },[])
-  const handleLogin=()=>{
-    const user={
-      email:email,
-      password:password
-    }
-    axios.post('http://192.168.0.18:8000/login',user).then((response)=>{
-      console.log("Login is successful ");
-      const token = response.data.token;
-      AsyncStorage.setItem('authToken',token);
-      navigation.replace("Main")
-    }).catch((error)=>{
-      Alert.alert("Login failed",error.message);
+  const handleLogin = async () => {
+    const user = {
+      email: email,
+      password: password
+    };
+  
+    try {
+      const response = await axios.post(`${REACT_NATIVE_APP_API_URL}/login`, user);
+      if (response.status === 200 && response.data.token) {
+        console.log("Login is successful");
+        const token = response.data.token;
+        await AsyncStorage.setItem('authToken', token);
+        navigation.replace("Main");
+      } else {
+        // If the response does not have a token or status is not 200
+        Alert.alert("Login failed", "Invalid email or password");
+      }
+    } catch (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        Alert.alert("Login failed", error.response.data.message);
+      } else if (error.request) {
+        // The request was made but no response was received
+        Alert.alert("Login failed", "No response from server");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert("Login failed", error.message);
+      }
       console.log(error);
-    })
-  }
+    }
+  };
+  
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: "white", alignItems: "center" }}

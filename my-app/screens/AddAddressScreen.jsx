@@ -25,10 +25,9 @@ const AddAddressScreen = () => {
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/addresses/${userId}`
+        `http://192.168.0.18:5000/addresses/${userId}`
       );
       const { addresses } = response.data;
-
       setAddresses(addresses);
     } catch (error) {
       console.log("error", error);
@@ -42,11 +41,12 @@ const AddAddressScreen = () => {
   );
   console.log("addresses", addresses);
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 50 }}>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <View
         style={{
           backgroundColor: "#00CED1",
           padding: 10,
+          paddingTop:50,
           flexDirection: "row",
           alignItems: "center",
         }}
@@ -58,7 +58,7 @@ const AddAddressScreen = () => {
             marginHorizontal: 7,
             gap: 10,
             backgroundColor: "white",
-            borderRadius: 3,
+            borderRadius: 50,
             height: 38,
             flex: 1,
           }}
@@ -128,7 +128,7 @@ const AddAddressScreen = () => {
               </Text>
 
               <Text style={{ fontSize: 15, color: "#181818" }}>
-                India, Bangalore
+                Karachi, Pakistan
               </Text>
 
               <Text style={{ fontSize: 15, color: "#181818" }}>

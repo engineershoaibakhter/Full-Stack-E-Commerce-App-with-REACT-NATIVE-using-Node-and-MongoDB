@@ -39,7 +39,7 @@ const sendVerificationEmail=async (email,verificationToken)=>{
         service:"gmail",
         auth:{
             user:"shoaibakhter181422@gmail.com",
-            pass:"zqbc kaaf lvjm ryou",
+            pass:"empz nlin zcto yaio",
         },
     });
 

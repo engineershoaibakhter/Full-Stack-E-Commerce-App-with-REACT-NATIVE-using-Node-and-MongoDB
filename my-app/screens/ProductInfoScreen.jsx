@@ -1,4 +1,3 @@
-
 import {
     StyleSheet,
     Text,
@@ -244,4 +243,3 @@ import {
   export default ProductInfoScreen;
   
   const styles = StyleSheet.create({});
-  

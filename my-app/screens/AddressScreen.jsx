@@ -7,72 +7,100 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useEffect, useState,useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwt_decode from "jwt-decode"
+import jwt_decode from "jwt-decode";
 import { UserType } from "../UserContext";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { REACT_NATIVE_APP_API_URL } from '@env';
 
 const AddressScreen = () => {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
   const [name, setName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
   const [houseNo, setHouseNo] = useState("");
   const [street, setStreet] = useState("");
   const [landmark, setLandmark] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const {userId,setUserId} = useContext(UserType)
+  const { userId, setUserId } = useContext(UserType);
+
   useEffect(() => {
-    const fetchUser = async() => {
+    const fetchUser = async () => {
+      try {
         const token = await AsyncStorage.getItem("authToken");
-        const decodedToken = jwt_decode(token);
-        const userId = decodedToken.userId;
-        setUserId(userId)
+        console.log("token", token);
+        if (token) {
+          const decodedToken = jwt_decode(token);
+          console.log("decodedToken", decodedToken);
+          const userId = decodedToken.userId;
+          console.log("userId", userId);
+          setUserId(userId);
+          console.log("Fetched userId:", userId);
+        } else {
+          console.log("No token found");
+        }
+      } catch (error) {
+        console.error("Error fetching token:", error);
+      }
+    };
+  
+    fetchUser();
+  }, [setUserId]);
+  
+
+  const handleAddAddress = async () => {
+    const address = {
+      name,
+      mobileNo,
+      houseNo,
+      street,
+      landmark,
+      postalCode,
+    };
+
+    console.log("Attempting to add address with userId:", userId);
+
+    if (!userId) {
+      Alert.alert("Error", "User ID is not set. Please try again.");
+      return;
     }
 
-    fetchUser();
-  },[]);
-  console.log(userId)
-  const handleAddAddress = () => {
-      const address = {
-          name,
-          mobileNo,
-          houseNo,
-          street,
-          landmark,
-          postalCode
+    try {
+      const response = await axios.post(`${REACT_NATIVE_APP_API_URL}/addresses`, {
+        userId,
+        address,
+      });
+      if (response.status === 201 || response.status === 200) {
+        Alert.alert("Success", "Address added successfully");
+        setName("");
+        setMobileNo("");
+        setHouseNo("");
+        setStreet("");
+        setLandmark("");
+        setPostalCode("");
+
+        setTimeout(() => {
+          navigation.goBack();
+        }, 500);
+      } else {
+        Alert.alert("Failed", "Response status is not 201");
+        console.log("Failed");
       }
+    } catch (error) {
+      Alert.alert("Error", "Failed to add address");
+      console.log("Error:", error.response ? error.response.data : error.message);
+    }
+  };
 
-      axios.post("http://localhost:8000/addresses",{userId,address}).then((response) => {
-          Alert.alert("Success","Addresses added successfully");
-          setName("");
-          setMobileNo("");
-          setHouseNo("");
-          setStreet("");
-          setLandmark("");
-          setPostalCode("");
-
-          setTimeout(() => {
-            navigation.goBack();
-          },500)
-      }).catch((error) => {
-          Alert.alert("Error","Failed to add address")
-          console.log("error",error)
-      })
-  }
   return (
-    <ScrollView style={{ marginTop: 50 }}>
+    <ScrollView>
       <View style={{ height: 50, backgroundColor: "#00CED1" }} />
-
       <View style={{ padding: 10 }}>
-        <Text style={{ fontSize: 17, fontWeight: "bold" }}>
-          Add a new Address
-        </Text>
-
+        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Add a new Address</Text>
         <TextInput
           placeholderTextColor={"black"}
-          placeholder="India"
+          placeholder="Pakistan"
           style={{
             padding: 10,
             borderColor: "#D0D0D0",
@@ -81,12 +109,8 @@ const AddressScreen = () => {
             borderRadius: 5,
           }}
         />
-
         <View style={{ marginVertical: 10 }}>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Full name (First and last name)
-          </Text>
-
+          <Text style={{ fontSize: 15, fontWeight: "bold" }}>Full name (First and last name)</Text>
           <TextInput
             value={name}
             onChangeText={(text) => setName(text)}
@@ -98,15 +122,11 @@ const AddressScreen = () => {
               marginTop: 10,
               borderRadius: 5,
             }}
-            placeholder="enter your name"
+            placeholder="Enter Name"
           />
         </View>
-
         <View>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Mobile numebr
-          </Text>
-
+          <Text style={{ fontSize: 15, fontWeight: "bold" }}>Mobile number</Text>
           <TextInput
             value={mobileNo}
             onChangeText={(text) => setMobileNo(text)}
@@ -121,12 +141,8 @@ const AddressScreen = () => {
             placeholder="Mobile No"
           />
         </View>
-
         <View style={{ marginVertical: 10 }}>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Flat,House No,Building,Company
-          </Text>
-
+          <Text style={{ fontSize: 15, fontWeight: "bold" }}>Flat, House No, Building, Company</Text>
           <TextInput
             value={houseNo}
             onChangeText={(text) => setHouseNo(text)}
@@ -141,11 +157,8 @@ const AddressScreen = () => {
             placeholder=""
           />
         </View>
-
         <View>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Area,Street,sector,village
-          </Text>
+          <Text style={{ fontSize: 15, fontWeight: "bold" }}>Area, Street, sector, village</Text>
           <TextInput
             value={street}
             onChangeText={(text) => setStreet(text)}
@@ -160,7 +173,6 @@ const AddressScreen = () => {
             placeholder=""
           />
         </View>
-
         <View style={{ marginVertical: 10 }}>
           <Text style={{ fontSize: 15, fontWeight: "bold" }}>Landmark</Text>
           <TextInput
@@ -174,13 +186,11 @@ const AddressScreen = () => {
               marginTop: 10,
               borderRadius: 5,
             }}
-            placeholder="Eg near appollo hospital"
+            placeholder="Eg Near Zubaida hospital"
           />
         </View>
-
         <View>
           <Text style={{ fontSize: 15, fontWeight: "bold" }}>Pincode</Text>
-
           <TextInput
             value={postalCode}
             onChangeText={(text) => setPostalCode(text)}
@@ -192,12 +202,11 @@ const AddressScreen = () => {
               marginTop: 10,
               borderRadius: 5,
             }}
-            placeholder="Enter Pincode"
+            placeholder="Enter PinCode"
           />
         </View>
-
         <Pressable
-        onPress={handleAddAddress}
+          onPress={handleAddAddress}
           style={{
             backgroundColor: "#FFC72C",
             padding: 19,

@@ -36,11 +36,12 @@ const CartScreen = () => {
   };
   const navigation = useNavigation();
   return (
-    <ScrollView style={{ marginTop: 55, flex: 1, backgroundColor: "white" }}>
+    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
       <View
         style={{
           backgroundColor: "#00CED1",
           padding: 10,
+          paddingTop:50,
           flexDirection: "row",
           alignItems: "center",
         }}
@@ -52,7 +53,7 @@ const CartScreen = () => {
             marginHorizontal: 7,
             gap: 10,
             backgroundColor: "white",
-            borderRadius: 3,
+            borderRadius: 20,
             height: 38,
             flex: 1,
           }}

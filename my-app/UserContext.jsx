@@ -1,14 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React,{useContext} from 'react'
+import { createContext, useState } from "react";
 
-const UserContext = () => {
+const UserType = createContext();
+
+const UserContext = ({ children }) => {
+  const [userId, setUserId] = useState("");
+
   return (
-    <View>
-      <Text>UserContext</Text>
-    </View>
-  )
-}
+    <UserType.Provider value={{ userId, setUserId }}>
+      {children}
+    </UserType.Provider>
+  );
+};
 
-export default UserContext
-
-const styles = StyleSheet.create({})
+export { UserType, UserContext };
