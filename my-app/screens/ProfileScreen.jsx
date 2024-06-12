@@ -12,6 +12,7 @@ import { Ionicons, AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { REACT_NATIVE_APP_API_URL } from "@env";
 
 const ProfileScreen = () => {
   const { userId, setUserId } = useContext(UserType);
@@ -53,7 +54,7 @@ const ProfileScreen = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/profile/${userId}`
+          `${REACT_NATIVE_APP_API_URL}/profile/${userId}`
         );
         const { user } = response.data;
         setUser(user);
@@ -76,7 +77,7 @@ const ProfileScreen = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/orders/${userId}`
+          `${REACT_NATIVE_APP_API_URL}/orders/${userId}`
         );
         const orders = response.data.orders;
         setOrders(orders);

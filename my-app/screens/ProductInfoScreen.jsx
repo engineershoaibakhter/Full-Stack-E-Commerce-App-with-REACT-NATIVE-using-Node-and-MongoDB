@@ -34,15 +34,17 @@ import {
     console.log(cart);
     return (
       <ScrollView
-        style={{ marginTop: 55, flex: 1, backgroundColor: "white" }}
+        style={{ flex: 1, backgroundColor: "white" }}
         showsVerticalScrollIndicator={false}
       >
         <View
           style={{
             backgroundColor: "#00CED1",
             padding: 10,
+            paddingTop:55,
             flexDirection: "row",
             alignItems: "center",
+            paddingBottom:15
           }}
         >
           <Pressable
@@ -55,6 +57,7 @@ import {
               borderRadius: 3,
               height: 38,
               flex: 1,
+              borderRadius:20,
             }}
           >
             <AntDesign
@@ -152,7 +155,7 @@ import {
           </Text>
   
           <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 6 }}>
-            ₹{route?.params?.price}
+            Rs {route?.params?.price}
           </Text>
         </View>
   
@@ -176,9 +179,9 @@ import {
   
         <View style={{ padding: 10 }}>
           <Text style={{ fontSize: 15, fontWeight: "bold", marginVertical: 5 }}>
-            Total : ₹{route.params.price}
+            Total : Rs {route.params.price}
           </Text>
-          <Text style={{ color: "#00CED1" }}>
+          <Text style={{ color: "red" }}>
             FREE delivery Tomorrow by 3 PM.Order within 10hrs 30 mins
           </Text>
   
@@ -193,7 +196,7 @@ import {
             <Ionicons name="location" size={24} color="black" />
   
             <Text style={{ fontSize: 15, fontWeight: "500" }}>
-              Deliver To Sujan - Bangalore 560019
+              Deliver To Shoaib - Karachi Pakistan
             </Text>
           </View>
         </View>

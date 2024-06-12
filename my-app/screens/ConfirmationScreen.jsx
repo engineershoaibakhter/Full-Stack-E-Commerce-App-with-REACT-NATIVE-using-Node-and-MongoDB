@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Pressable,Alert } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Pressable, Alert } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { UserType } from "../UserContext";
@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { cleanCart } from "../redux/CartReducer";
 import { useNavigation } from "@react-navigation/native";
 import RazorpayCheckout from "react-native-razorpay";
+import { REACT_NATIVE_APP_API_URL } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ConfirmationScreen = () => {
   const steps = [
@@ -19,21 +21,47 @@ const ConfirmationScreen = () => {
   const navigation = useNavigation();
   const [currentStep, setCurrentStep] = useState(0);
   const [addresses, setAddresses] = useState([]);
-  const { userId, setUserId } = useContext(UserType);
+  const [ userId, setUserId ] = useState("");
   const cart = useSelector((state) => state.cart.cart);
   const total = cart
     ?.map((item) => item.price * item.quantity)
     .reduce((curr, prev) => curr + prev, 0);
   useEffect(() => {
-    fetchAddresses();
+    const fetchUser = async () => {
+      try {
+        const email = await AsyncStorage.getItem("userEmail"); // Assuming you store user email in AsyncStorage
+        if (email) {
+          const response = await axios.get(`${REACT_NATIVE_APP_API_URL}/user/${email}`);
+          if (response.status === 200) {
+            setUserId(response.data.userId);
+            console.log("response.data.userId: ",response.data.userId);
+          } else {
+            console.log("Failed to fetch userId");
+          }
+        } else {
+          console.log("No email found");
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+
+    };
+
+    fetchUser();
+
   }, []);
+  useEffect(() => {
+    if (userId) {
+      fetchAddresses();
+    }
+  }, [userId]);
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8081/addresses/${userId}`
+        `${REACT_NATIVE_APP_API_URL}/addresses/${userId}`
       );
       const { addresses } = response.data;
-
+      console.log("Addresses: ",addresses);
       setAddresses(addresses);
     } catch (error) {
       console.log("error", error);
@@ -54,7 +82,7 @@ const ConfirmationScreen = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8081/orders",
+        `${REACT_NATIVE_APP_API_URL}/orders`,
         orderData
       );
       if (response.status === 200) {
@@ -65,14 +93,14 @@ const ConfirmationScreen = () => {
         console.log("error creating order", response.data);
       }
     } catch (error) {
-      console.log("errror", error);
+      console.log("error", error);
     }
   };
   const pay = async () => {
     try {
       const options = {
         description: "Adding To Wallet",
-        currency: "INR",
+        currency: "PKR",
         name: "Amazon",
         key: "rzp_test_E3GWYimxN7YMk8",
         amount: total * 100,
@@ -97,7 +125,7 @@ const ConfirmationScreen = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8000/orders",
+        `${REACT_NATIVE_APP_API_URL}/orders`,
         orderData
       );
       if (response.status === 200) {
@@ -123,7 +151,7 @@ const ConfirmationScreen = () => {
           }}
         >
           {steps?.map((step, index) => (
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <View key={index} style={{ justifyContent: "center", alignItems: "center" }}>
               {index > 0 && (
                 <View
                   style={[
@@ -149,7 +177,7 @@ const ConfirmationScreen = () => {
                   <Text
                     style={{ fontSize: 16, fontWeight: "bold", color: "white" }}
                   >
-                    &#10003;
+                    &#10003; 
                   </Text>
                 ) : (
                   <Text
@@ -176,6 +204,7 @@ const ConfirmationScreen = () => {
           <Pressable>
             {addresses?.map((item, index) => (
               <Pressable
+                key={item?._id}
                 style={{
                   borderWidth: 1,
                   borderColor: "#D0D0D0",
@@ -197,6 +226,8 @@ const ConfirmationScreen = () => {
                     size={20}
                     color="gray"
                   />
+
+
                 )}
 
                 <View style={{ marginLeft: 6 }}>
@@ -426,7 +457,7 @@ const ConfirmationScreen = () => {
               />
             )}
 
-            <Text>UPI / Credit or debit card</Text>
+            <Text>Credit or debit card</Text>
           </View>
           <Pressable
             onPress={() => setCurrentStep(3)}
@@ -500,7 +531,7 @@ const ConfirmationScreen = () => {
                 Items
               </Text>
 
-              <Text style={{ color: "gray", fontSize: 16 }}>₹{total}</Text>
+              <Text style={{ color: "gray", fontSize: 16 }}>Rs {total}</Text>
             </View>
 
             <View
@@ -515,7 +546,7 @@ const ConfirmationScreen = () => {
                 Delivery
               </Text>
 
-              <Text style={{ color: "gray", fontSize: 16 }}>₹0</Text>
+              <Text style={{ color: "gray", fontSize: 16 }}>Rs 0</Text>
             </View>
 
             <View
@@ -533,7 +564,7 @@ const ConfirmationScreen = () => {
               <Text
                 style={{ color: "#C60C30", fontSize: 17, fontWeight: "bold" }}
               >
-                ₹{total}
+                Rs {total}
               </Text>
             </View>
           </View>

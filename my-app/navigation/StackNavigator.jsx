@@ -31,12 +31,12 @@ const StackNavigator = () => {
             tabBarLabel: "Home",
             tabBarLabelStyle: { color: "#008E97" },
             headerShown: false,
-            // tabBarIcon: ({ focused }) =>
-            //   focused ? (
-            //     <Entypo name="home" size={24} color="#008E97" />
-            //   ) : (
-            //     <AntDesign name="home" size={24} color="black" />
-            //   ),
+            tabBarIcon: ({ focused }) =>
+              focused ? (
+                <Entypo name="home" size={24} color="#008E97" />
+              ) : (
+                <AntDesign name="home" size={24} color="black" />
+              ),
           }}
         />
 
@@ -46,13 +46,12 @@ const StackNavigator = () => {
           options={{
             tabBarLabel: "Profile",
             tabBarLabelStyle: { color: "#008E97" },
-            // tabBarIcon:()=>(<FontAwesome name="user" size={24} color="#008E97" />)
-            // tabBarIcon: ({ focused }) =>
-            //   focused ? (
-            //     <Ionicons name="person" size={24} color="#008E97" />
-            //   ) : (
-            //     <Ionicons name="person-outline" size={24} color="black" />
-            //   ),
+            tabBarIcon: ({ focused }) =>
+              focused ? (
+                <Ionicons name="person" size={24} color="#008E97" />
+              ) : (
+                <Ionicons name="person-outline" size={24} color="black" />
+              ),
           }}
         />
 
@@ -63,12 +62,12 @@ const StackNavigator = () => {
             tabBarLabel: "Cart",
             tabBarLabelStyle: { color: "#008E97" },
             headerShown: false,
-            // tabBarIcon: ({ focused }) =>
-            //   focused ? (
-            //     <AntDesign name="shoppingcart" size={24} color="#008E97" />
-            //   ) : (
-            //     <AntDesign name="shoppingcart" size={24} color="black" />
-            //   ),
+            tabBarIcon: ({ focused }) =>
+              focused ? (
+                <AntDesign name="shoppingcart" size={24} color="#008E97" />
+              ) : (
+                <AntDesign name="shoppingcart" size={24} color="black" />
+              ),
           }}
         />
       </Tab.Navigator>

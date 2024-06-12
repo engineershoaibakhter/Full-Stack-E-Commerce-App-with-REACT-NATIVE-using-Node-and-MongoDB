@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { REACT_NATIVE_APP_API_URL } from '@env';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const LoginScreen = () => {
   const [email,setEmail]=useState("");
@@ -48,6 +49,7 @@ const LoginScreen = () => {
         console.log("Login is successful");
         const token = response.data.token;
         await AsyncStorage.setItem('authToken', token);
+        await AsyncStorage.setItem('userEmail', email);
         navigation.replace("Main");
       } else {
         // If the response does not have a token or status is not 200

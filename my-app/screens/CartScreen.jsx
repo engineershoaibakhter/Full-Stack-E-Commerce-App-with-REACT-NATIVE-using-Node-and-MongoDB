@@ -168,7 +168,33 @@ const CartScreen = () => {
                   borderRadius: 7,
                 }}
               >
-                {item?.quantity > 1 ? (
+                {/* {item?.quantity > 1 ? (
+                  <Pressable
+                  onPress={() => decreaseQuantity(item)}
+                  style={{
+                    backgroundColor: "#D8D8D8",
+                    padding: 7,
+                    borderTopLeftRadius: 6,
+                    borderBottomLeftRadius: 6,
+                  }}
+                >
+                  <Text>-</Text>
+                </Pressable>
+                ) : (
+                  <Pressable
+                    onPress={() => deleteItem(item)}
+                    style={{
+                      backgroundColor: "#D8D8D8",
+                      padding: 7,
+                      borderTopLeftRadius: 6,
+                      borderBottomLeftRadius: 6,
+                    }}
+                  >
+                    <AntDesign name="delete" size={24} color="black" />
+                  </Pressable>
+                )} */}
+
+{item?.quantity > 1 ? (
                   <Pressable
                     onPress={() => decreaseQuantity(item)}
                     style={{

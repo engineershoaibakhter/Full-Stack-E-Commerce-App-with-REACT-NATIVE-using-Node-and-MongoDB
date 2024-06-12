@@ -1,3 +1,4 @@
+import React, { useEffect, useState, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,13 +8,11 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwt_decode from "jwt-decode";
-import { UserType } from "../UserContext";
-import axios from "axios";
+import axios from "axios"; // Ensure axios is imported correctly
 import { useNavigation } from "@react-navigation/native";
-import { REACT_NATIVE_APP_API_URL } from '@env';
+import { UserType } from "../UserContext";
+import { REACT_NATIVE_APP_API_URL } from "@env";
 
 const AddressScreen = () => {
   const navigation = useNavigation();
@@ -28,26 +27,24 @@ const AddressScreen = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = await AsyncStorage.getItem("authToken");
-        console.log("token", token);
-        if (token) {
-          const decodedToken = jwt_decode(token);
-          console.log("decodedToken", decodedToken);
-          const userId = decodedToken.userId;
-          console.log("userId", userId);
-          setUserId(userId);
-          console.log("Fetched userId:", userId);
+        const email = await AsyncStorage.getItem("userEmail"); // Assuming you store user email in AsyncStorage
+        if (email) {
+          const response = await axios.get(`${REACT_NATIVE_APP_API_URL}/user/${email}`);
+          if (response.status === 200) {
+            setUserId(response.data.userId);
+          } else {
+            console.log("Failed to fetch userId");
+          }
         } else {
-          console.log("No token found");
+          console.log("No email found");
         }
       } catch (error) {
-        console.error("Error fetching token:", error);
+        console.error("Error fetching user:", error);
       }
     };
-  
+
     fetchUser();
   }, [setUserId]);
-  
 
   const handleAddAddress = async () => {
     const address = {
@@ -59,13 +56,12 @@ const AddressScreen = () => {
       postalCode,
     };
 
-    console.log("Attempting to add address with userId:", userId);
-
     if (!userId) {
       Alert.alert("Error", "User ID is not set. Please try again.");
       return;
     }
 
+    if(name!=="" || mobileNo!=="" || houseNo!=="" || street!=="" || landmark!=="" || postalCode!==""){
     try {
       const response = await axios.post(`${REACT_NATIVE_APP_API_URL}/addresses`, {
         userId,
@@ -85,22 +81,25 @@ const AddressScreen = () => {
         }, 500);
       } else {
         Alert.alert("Failed", "Response status is not 201");
-        console.log("Failed");
       }
     } catch (error) {
       Alert.alert("Error", "Failed to add address");
       console.log("Error:", error.response ? error.response.data : error.message);
     }
+  }
+  else{
+    Alert.alert("Enter All Form Field")
+  }
   };
 
   return (
     <ScrollView>
-      <View style={{ height: 50, backgroundColor: "#00CED1" }} />
+      <View style={{ height: 50 }} />
       <View style={{ padding: 10 }}>
-        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Add a new Address</Text>
+        <Text style={{ fontSize: 27, fontWeight: "bold",textAlign:"center" }}>Add a new Address</Text>
         <TextInput
           placeholderTextColor={"black"}
-          placeholder="Pakistan"
+          placeholder="Enter Country Name"
           style={{
             padding: 10,
             borderColor: "#D0D0D0",
@@ -138,7 +137,7 @@ const AddressScreen = () => {
               marginTop: 10,
               borderRadius: 5,
             }}
-            placeholder="Mobile No"
+            placeholder="Enter Mobile No"
           />
         </View>
         <View style={{ marginVertical: 10 }}>
@@ -154,7 +153,7 @@ const AddressScreen = () => {
               marginTop: 10,
               borderRadius: 5,
             }}
-            placeholder=""
+            placeholder="Enter House No"
           />
         </View>
         <View>
@@ -170,7 +169,7 @@ const AddressScreen = () => {
               marginTop: 10,
               borderRadius: 5,
             }}
-            placeholder=""
+            placeholder="Enter Area"
           />
         </View>
         <View style={{ marginVertical: 10 }}>
@@ -202,7 +201,7 @@ const AddressScreen = () => {
               marginTop: 10,
               borderRadius: 5,
             }}
-            placeholder="Enter PinCode"
+            placeholder="Enter Pin-code"
           />
         </View>
         <Pressable

@@ -13,6 +13,7 @@ import { Entypo } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { UserType } from "../UserContext";
+import { REACT_NATIVE_APP_API_URL } from "@env";
 
 const AddAddressScreen = () => {
   const navigation = useNavigation();
@@ -25,7 +26,7 @@ const AddAddressScreen = () => {
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.0.18:5000/addresses/${userId}`
+        `${REACT_NATIVE_APP_API_URL}/addresses/${userId}`
       );
       const { addresses } = response.data;
       setAddresses(addresses);
@@ -85,12 +86,14 @@ const AddAddressScreen = () => {
             alignItems: "center",
             justifyContent: "space-between",
             marginTop: 10,
-            borderColor: "#D0D0D0",
+            borderColor: "yellow",
+            backgroundColor:"#FEBE10",
             borderWidth: 1,
             borderLeftWidth: 0,
             borderRightWidth: 0,
             paddingVertical: 7,
             paddingHorizontal: 5,
+            borderRadius:50
           }}
         >
           <Text>Add a new Address</Text>

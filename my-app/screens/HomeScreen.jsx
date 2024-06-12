@@ -10,11 +10,8 @@ import {
   Image,
 } from "react-native";
 import React, { useState, useEffect, useCallback, useContext } from "react";
-import { Feather } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons, Entypo, AntDesign } from "@expo/vector-icons"; // Include other icons from expo if needed
 import { SliderBox } from "react-native-image-slider-box";
 import axios from "axios";
 import ProductItem from "../components/ProductItem";
@@ -25,7 +22,7 @@ import { BottomModal, SlideAnimation, ModalContent } from "react-native-modals";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserType } from "../UserContext";
 import jwt_decode from "jwt-decode";
-
+import { REACT_NATIVE_APP_API_URL } from "@env";
 const HomeScreen = () => {
   const list = [
     {
@@ -236,7 +233,7 @@ const HomeScreen = () => {
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/addresses/${userId}`
+        `${REACT_NATIVE_APP_API_URL}/addresses/${userId}`
       );
       const { addresses } = response.data;
 
@@ -247,10 +244,28 @@ const HomeScreen = () => {
   };
   useEffect(() => {
     const fetchUser = async () => {
-      const token = await AsyncStorage.getItem("authToken");
-      const decodedToken = jwt_decode(token);
-      const userId = decodedToken.userId;
-      setUserId(userId);
+      // const token = await AsyncStorage.getItem("authToken");
+      // const decodedToken = jwt_decode(token);
+      // const userId = decodedToken.userId;
+      // setUserId(userId);
+
+      try {
+        const email = await AsyncStorage.getItem("userEmail"); // Assuming you store user email in AsyncStorage
+        if (email) {
+          const response = await axios.get(`${REACT_NATIVE_APP_API_URL}/user/${email}`);
+          if (response.status === 200) {
+            setUserId(response.data.userId);
+            console.log("response.data.userId: ",response.data.userId);
+          } else {
+            console.log("Failed to fetch userId");
+          }
+        } else {
+          console.log("No email found");
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+
     };
 
     fetchUser();
@@ -270,7 +285,7 @@ const HomeScreen = () => {
             style={{
               backgroundColor: "#55d0dd",
               padding: 10,
-              paddingTop:50,
+              paddingTop:60,
               flexDirection: "row",
               alignItems: "center",
             }}
@@ -491,6 +506,7 @@ const HomeScreen = () => {
                 height: 30,
                 marginBottom: open ? 120 : 15,
               }}
+              
               open={open}
               value={category} //genderValue
               items={items}
@@ -501,6 +517,9 @@ const HomeScreen = () => {
               placeholderStyle={styles.placeholderStyles}
               onOpen={onGenderOpen}
               // onChangeValue={onChange}
+          ArrowDownIconComponent={() => (
+            <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+          )}
               zIndex={3000}
               zIndexInverse={1000}
             />
@@ -516,9 +535,11 @@ const HomeScreen = () => {
             {products
               ?.filter((item) => item.category === category)
               .map((item, index) => (
-                <ProductItem item={item} key={index} />
+                <ProductItem item={item} key={index} /> 
+              
               ))}
           </View>
+          
         </ScrollView>
       </SafeAreaView>
 
